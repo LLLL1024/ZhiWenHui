@@ -51,8 +51,8 @@ public class FileController {
     @PostMapping("/upload")
     public BaseResponse<String> uploadFile(@RequestPart("file") MultipartFile multipartFile,
             UploadFileRequest uploadFileRequest, HttpServletRequest request) {
-//        String biz = uploadFileRequest.getBiz();
-        String biz = "app_icon";
+        String biz = uploadFileRequest.getBiz();
+//        String biz = "app_icon";
         FileUploadBizEnum fileUploadBizEnum = FileUploadBizEnum.getEnumByValue(biz);
         if (fileUploadBizEnum == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

@@ -21,6 +21,7 @@
         <PictureUploader
           :value="form.appIcon"
           :onChange="(value) => (form.appIcon = value)"
+          biz="app_icon"
         />
       </a-form-item>
       <a-form-item field="appType" label="应用类型">
