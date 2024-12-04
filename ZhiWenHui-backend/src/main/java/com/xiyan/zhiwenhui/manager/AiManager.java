@@ -91,7 +91,7 @@ public class AiManager {
         // 构建请求
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
 //                .model(Constants.ModelChatGLM4)
-                .model("glm-4-flashx") // 修改大模型
+                .model("glm-4-air") // 修改大模型
                 .stream(stream)
                 .temperature(temperature)
                 .invokeMethod(Constants.invokeMethod)
@@ -137,7 +137,7 @@ public class AiManager {
         // 构建请求
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
 //                .model(Constants.ModelChatGLM4)
-                .model("glm-4-flashx")  // 修改大模型
+                .model("glm-4-air")  // 修改大模型
                 .stream(Boolean.TRUE)
                 .temperature(temperature)
                 .invokeMethod(Constants.invokeMethod)

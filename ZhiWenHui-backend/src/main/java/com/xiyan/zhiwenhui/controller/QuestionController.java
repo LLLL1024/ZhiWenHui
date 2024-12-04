@@ -314,11 +314,13 @@ public class QuestionController {
         ThrowUtils.throwIf(app == null, ErrorCode.NOT_FOUND_ERROR);
         // 封装 Prompt
         String userMessage = getGenerateQuestionUserMessage(app, questionNumber, optionNumber);
-        // AI 生成
+        // AI 生成  AI 生成题目不应该稳定（需提高随机性），让思维发散，可以用aiManager.doSyncUnstableRequest(GENERATE_QUESTION_SYSTEM_MESSAGE, userMessage);
+//        String result = aiManager.doSyncUnstableRequest(GENERATE_QUESTION_SYSTEM_MESSAGE, userMessage);
         String result = aiManager.doSyncRequest(GENERATE_QUESTION_SYSTEM_MESSAGE, userMessage, null);
         // 截取需要的 JSON 信息
         int start = result.indexOf("[");
         int end = result.lastIndexOf("]");
+        // substring 方法的参数是开始索引（包含）和结束索引（不包含），因此需要 end + 1 来确保 ] 字符也被包含在子字符串中。
         String json = result.substring(start, end + 1);
         List<QuestionContentDTO> questionContentDTOList = JSONUtil.toList(json, QuestionContentDTO.class);
         return ResultUtils.success(questionContentDTOList);

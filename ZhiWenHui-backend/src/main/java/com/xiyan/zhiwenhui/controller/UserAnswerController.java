@@ -1,6 +1,7 @@
 package com.xiyan.zhiwenhui.controller;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiyan.zhiwenhui.annotation.AuthCheck;
@@ -94,6 +95,10 @@ public class UserAnswerController {
         }
         // 返回新写入的数据 id
         long newUserAnswerId = userAnswer.getId();
+        // 如果是得分类应用，不支持选择 AI 评分策略
+        if (app.getAppType() == 0 && app.getScoringStrategy() == 1) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "得分类应用，不支持选择 AI 评分策略");
+        }
         // 调用评分模块
         try {
             UserAnswer userAnswerWithResult = scoringStrategyExecutor.doScore(choices, app);
@@ -103,6 +108,9 @@ public class UserAnswerController {
         } catch (Exception e) {
             e.printStackTrace();
             // todo 可以用 Sentinel 去降级
+            if (e instanceof JSONException) {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "JSON 解析错误");
+            }
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "评分错误");
         }
         return ResultUtils.success(newUserAnswerId);

@@ -104,7 +104,7 @@ public class AiTestScoringStrategy implements ScoringStrategy {
             // 2. 调用 AI 获取结果
             // 封装 Prompt
             String userMessage = getAiTestScoringUserMessage(app, questionContent, choices);
-            // AI 生成
+            // AI 生成  AI 评分需要稳定（降低随机性）避免相同的答案每次得到不一样的分析结果
             String result = aiManager.doSyncStableRequest(AI_TEST_SCORING_SYSTEM_MESSAGE, userMessage);
             // 截取需要的 JSON 信息
             int start = result.indexOf("{");
