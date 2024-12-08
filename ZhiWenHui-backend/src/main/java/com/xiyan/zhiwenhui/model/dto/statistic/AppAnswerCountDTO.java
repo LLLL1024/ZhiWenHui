@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class AppAnswerCountDTO {
 
+    // todo 应该是Long
     private String appId;
 
     /**

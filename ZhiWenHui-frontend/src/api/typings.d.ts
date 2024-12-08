@@ -148,6 +148,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListUserVO_ = {
+    code?: number;
+    data?: UserVO[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO_ = {
     code?: number;
     data?: LoginUserVO;
@@ -708,6 +714,11 @@ declare namespace API {
     userId?: number;
   };
 
+  type searchUsersByTagsUsingGETParams = {
+    /** tagNameList */
+    tagNameList?: string[];
+  };
+
   type SseEmitter = {
     timeout?: number;
   };
@@ -721,6 +732,7 @@ declare namespace API {
     id?: number;
     isDelete?: number;
     mpOpenId?: string;
+    tags?: string;
     unionId?: string;
     updateTime?: string;
     userAccount?: string;
@@ -732,6 +744,7 @@ declare namespace API {
   };
 
   type UserAddRequest = {
+    tags?: string;
     userAccount?: string;
     userAvatar?: string;
     userName?: string;
@@ -835,6 +848,7 @@ declare namespace API {
   };
 
   type UserUpdateMyRequest = {
+    tags?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
@@ -842,6 +856,7 @@ declare namespace API {
 
   type UserUpdateRequest = {
     id?: number;
+    tags?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
@@ -851,6 +866,7 @@ declare namespace API {
   type UserVO = {
     createTime?: string;
     id?: number;
+    tags?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;

@@ -12,7 +12,7 @@
     <div class="searchBar">
       <a-form
         :model="formSearchParams"
-        :style="{ marginBottom: '20px', marginLeft: '28%' }"
+        :style="{ marginBottom: '20px' }"
         layout="inline"
         @submit="doSearch"
       >

@@ -2,11 +2,16 @@ package com.xiyan.zhiwenhui.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xiyan.zhiwenhui.common.ErrorCode;
+import com.xiyan.zhiwenhui.exception.BusinessException;
 import com.xiyan.zhiwenhui.model.dto.user.UserQueryRequest;
 import com.xiyan.zhiwenhui.model.entity.User;
 import com.xiyan.zhiwenhui.model.vo.LoginUserVO;
 import com.xiyan.zhiwenhui.model.vo.UserVO;
+import org.springframework.util.CollectionUtils;
+
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -107,5 +112,13 @@ public interface UserService extends IService<User> {
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+    /**
+     * 根据标签搜索用户（内存过滤）
+     *
+     * @param tagNameList
+     * @return
+     */
+    List<UserVO> searchUsersByTags(List<String> tagNameList);
 
 }

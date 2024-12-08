@@ -166,6 +166,10 @@ const columns = [
     dataIndex: "userRole",
   },
   {
+    title: " 标签",
+    dataIndex: "tags",
+  },
+  {
     title: "创建时间",
     dataIndex: "createTime",
     slotName: "createTime",

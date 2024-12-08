@@ -87,7 +87,7 @@ public class AiTestScoringStrategy implements ScoringStrategy {
         // 定义锁
         RLock lock = redissonClient.getLock(AI_ANSWER_LOCK + cacheKey);
         try {
-            // 竞争锁
+            // 竞争锁 竞争分布式锁，等待 3 秒，15 秒自动释放
             boolean res = lock.tryLock(3, 15, TimeUnit.SECONDS);
             // 没抢到锁，强行返回
             if (!res) {
@@ -122,8 +122,9 @@ public class AiTestScoringStrategy implements ScoringStrategy {
             userAnswer.setChoices(jsonStr);
             return userAnswer;
         } finally {
-            // 必须是自己才能释放自己的锁，例如：A 30 > 20 B 20，A 执行完30后会将A和B的锁都释放，因为A和B是同样的key，这样导致B都没有执行就结束了
+            // 必须是自己才能释放自己的锁，例如：A 20s < 30s B ，A 执行完20s后会将A和B的锁都释放，因为A和B是同样的key，这样导致B都没有执行就结束了
             if (lock != null && lock.isLocked()) {
+                // 进一步检查当前线程是否持有这个锁。这是为了防止其他线程释放不属于它的锁，因为只有持有锁的线程才有权限释放它。
                 if (lock.isHeldByCurrentThread()) {
                     lock.unlock();
                 }

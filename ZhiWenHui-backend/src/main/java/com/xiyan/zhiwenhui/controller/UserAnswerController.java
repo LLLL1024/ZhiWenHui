@@ -91,7 +91,7 @@ public class UserAnswerController {
             boolean result = userAnswerService.save(userAnswer);
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         } catch (DuplicateKeyException e){
-            // ignore error
+            // ignore error 捕获主键重复的异常，直接忽略即可。
         }
         // 返回新写入的数据 id
         long newUserAnswerId = userAnswer.getId();
@@ -103,7 +103,7 @@ public class UserAnswerController {
         try {
             UserAnswer userAnswerWithResult = scoringStrategyExecutor.doScore(choices, app);
             userAnswerWithResult.setId(newUserAnswerId);
-            userAnswerWithResult.setAppId(null);
+            userAnswerWithResult.setAppId(null);  // 在之前 appId 就已经存入数据库了，所以最后还是会有 appId
             userAnswerService.updateById(userAnswerWithResult);
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,6 +3,8 @@ package com.xiyan.zhiwenhui.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xiyan.zhiwenhui.constant.CommonConstant;
 import com.xiyan.zhiwenhui.constant.UserConstant;
 import com.xiyan.zhiwenhui.exception.BusinessException;
@@ -15,14 +17,16 @@ import com.xiyan.zhiwenhui.model.enums.UserRoleEnum;
 import com.xiyan.zhiwenhui.model.vo.LoginUserVO;
 import com.xiyan.zhiwenhui.model.vo.UserVO;
 import com.xiyan.zhiwenhui.utils.SqlUtils;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 /**
@@ -39,6 +43,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 盐值，混淆密码
      */
     public static final String SALT = "xiyan";
+
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -234,5 +241,61 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 根据标签搜索用户（内存过滤）
+     *
+     * @param tagNameList 用户要拥有的标签
+     * @return
+     */
+    @Override
+    public List<UserVO> searchUsersByTags(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 1. 先查询所有用户
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        List<User> userList = userMapper.selectList(queryWrapper);
+        List<UserVO> userVOList = this.getUserVO(userList);
+        Gson gson = new Gson();
+        // 2. 在内存中判断是否包含要求的标签
+        return userVOList.stream().filter(user -> {
+            String tagsStr = user.getTags();
+//            if (StringUtils.isBlank(tagsStr)) {
+//                return false;
+//            }
+            Set<String> tempTagNameSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>() {
+            }.getType());
+            tempTagNameSet = Optional.ofNullable(tempTagNameSet).orElse(new HashSet<>());
+            for (String tagName : tagNameList) {
+                if (!tempTagNameSet.contains(tagName)) {
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据标签搜索用户（SQL 查询版）
+     *
+     * @param tagNameList 用户要拥有的标签
+     * @return
+     */
+    @Deprecated
+    private List<UserVO> searchUsersByTagsBySQL(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 拼接 and 查询
+        // like '%Java%' and like '%Python%'
+        for (String tagName : tagNameList) {
+            queryWrapper = queryWrapper.like("tags", tagName);
+        }
+        List<User> userList = userMapper.selectList(queryWrapper);
+        List<UserVO> userVOList = this.getUserVO(userList);
+        return userVOList.stream().collect(Collectors.toList());
     }
 }
